@@ -5,6 +5,7 @@ const ServicoExercicio = require("../src/services/pessoa");
 describe('Testes da Entidade Pessoa', () => {
    let servico;
    let transaction;
+   const mockPessoa = { nome: "Just for test", email: "test@domain.com", senha: "test#password" };
 
    beforeAll(async () => {
       servico = new ServicoExercicio();
@@ -24,9 +25,8 @@ describe('Testes da Entidade Pessoa', () => {
    });
 
    it('Should add a name', async () => {
-      const mockPessoa = { nome: "João da Silva", email: "batata@123.com", senha: "123456" };
       const pessoa = await servico.Adicionar(mockPessoa, transaction);
-      console.log(pessoa[pessoa.dataValues.id]) // pessoa.null
+      console.log(pessoa[pessoa.dataValues.id]) // ou (pessoa.null)
       expect(mockPessoa.nome).toBe(pessoa.dataValues.nome);
       expect(mockPessoa.email).toBe(pessoa.dataValues.email);
       expect(mockPessoa.senha).toBe(pessoa.dataValues.senha);
@@ -34,18 +34,22 @@ describe('Testes da Entidade Pessoa', () => {
    });
 
    it('Should update a name', async () => {
-      const id = 26;
-      const mockPessoa = { nome: "Josaao", email: "batata2@123.com", senha: "123456" };
-      const dataValue = await servico.Alterar(id, mockPessoa, transaction);
+      const pessoa = await servico.Adicionar(mockPessoa, transaction)
+      const id = pessoa.null; // ou pessoa[pessoa.dataValues.id]
+      const mockPessoaUpdate = {nome: "User Updated", email: "updated@domain.com", senha: "update#password" };
+
+      const dataValue = await servico.Alterar(id, mockPessoaUpdate, transaction);
 
       expect(id).toBe(dataValue.dataValues.id);
-      expect(mockPessoa.nome).toBe(dataValue.dataValues.nome);
-      expect(mockPessoa.email).toBe(dataValue.dataValues.email);
-      expect(mockPessoa.senha).toBe(dataValue.dataValues.senha);
+      expect(mockPessoaUpdate.nome).toBe(dataValue.dataValues.nome);
+      expect(mockPessoaUpdate.email).toBe(dataValue.dataValues.email);
+      expect(mockPessoaUpdate.senha).toBe(dataValue.dataValues.senha);
    });
 
    it('Should delete a name', async () => {
-      const id = 26;
+      const pessoa = await servico.Adicionar(mockPessoa, transaction)
+      const id = pessoa.null; // ou pessoa[pessoa.dataValues.id]
+
       const qtdeBefore = await Number(servico.PegarTodos().length); // 2
       const dataValue = await servico.Deletar(id, transaction);
 
