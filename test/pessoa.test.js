@@ -1,51 +1,57 @@
-const { describe, expect, it } = require('@jest/globals');
-
+const { describe, expect, it, beforeAll, afterAll, beforeEach } = require('@jest/globals');
 const conexao = require("../src/database")
 const ServicoExercicio = require("../src/services/pessoa");
 
-describe('Testes do primeiro exercício', () => {
-
-   const servico = new ServicoExercicio()
+describe('Testes da Entidade Pessoa', () => {
+   let servico;
+   let transaction;
 
    beforeAll(async () => {
-      this.transaction = await conexao.transaction();
+      servico = new ServicoExercicio();
       console.info('Iniciando TDD com jest!');
    });
 
-   afterAll(() => {
-      this.transaction.rollback();
+   beforeEach(async () => {
+      transaction = await conexao.transaction();
+   });
+
+   afterAll(async () => {
       console.info('Encerrados os testes');
    });
 
-   it('Should add a name', async () => {
-      const mockPessoa = { nome: "João da Silva", email: "batata@123.com", senha: "123456" }
-      const { dataValues } = await servico.Adicionar(mockPessoa, this.transaction)
+   afterEach(async () => {
+      await transaction.rollback();
+   });
 
-      expect(mockPessoa.nome).toBe(dataValues.nome);
-      expect(mockPessoa.email).toBe(dataValues.email);
-      expect(mockPessoa.senha).toBe(dataValues.senha);
-   })
+   it('Should add a name', async () => {
+      const mockPessoa = { nome: "João da Silva", email: "batata@123.com", senha: "123456" };
+      const pessoa = await servico.Adicionar(mockPessoa, transaction);
+      console.log(pessoa[pessoa.dataValues.id]) // pessoa.null
+      expect(mockPessoa.nome).toBe(pessoa.dataValues.nome);
+      expect(mockPessoa.email).toBe(pessoa.dataValues.email);
+      expect(mockPessoa.senha).toBe(pessoa.dataValues.senha);
+
+   });
 
    it('Should update a name', async () => {
-      const id = 1;
-      const mockPessoa = { nome: "Joao", email: "batata2@123.com", senha: "123456" }
-      const dataValue = await servico.Alterar(id, mockPessoa, this.transaction)
-      
+      const id = 26;
+      const mockPessoa = { nome: "Josaao", email: "batata2@123.com", senha: "123456" };
+      const dataValue = await servico.Alterar(id, mockPessoa, transaction);
+
       expect(id).toBe(dataValue.dataValues.id);
       expect(mockPessoa.nome).toBe(dataValue.dataValues.nome);
       expect(mockPessoa.email).toBe(dataValue.dataValues.email);
       expect(mockPessoa.senha).toBe(dataValue.dataValues.senha);
-   })
+   });
 
    it('Should delete a name', async () => {
-      const id = 1;
-      const dataValue = await servico.Deletar(id, this.transaction)
-      
-      expect(dataValue).toBe(dataValue.id);
-      
-      const result = () => (servico.PegarUm(id, this.transaction))
+      const id = 26;
+      const qtdeBefore = await Number(servico.PegarTodos().length); // 2
+      const dataValue = await servico.Deletar(id, transaction);
 
-      expect(result).toThrowError()
-   })
+      const qtdeAfter = await Number(servico.PegarTodos().length); // 1
 
-})
+      expect(dataValue).toBe(1);
+      expect(qtdeAfter + 1).toBe(qtdeBefore);
+   });
+});

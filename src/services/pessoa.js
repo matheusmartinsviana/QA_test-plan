@@ -38,12 +38,12 @@ class ServicoExercicio {
       return this.PegarUm(id, transaction)
     }
 
-    async Deletar(id){
+    async Deletar(id, transaction){
       if(!id || isNaN(id)) {
         throw new Error("Favor corretamente o id.")
       }
 
-      return repositorio.Deletar(id)
+      return repositorio.Deletar(id, transaction)
     }
 
 }

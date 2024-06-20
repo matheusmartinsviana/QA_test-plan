@@ -28,11 +28,12 @@ class RepositorioExercicio {
         })
     }
 
-    async Deletar(id){
+    async Deletar(id, transaction){
         return Pessoa.destroy({
             where: {
                 id
-            }
+            },
+            transaction
         })
     }
 
