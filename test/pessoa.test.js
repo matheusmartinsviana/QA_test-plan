@@ -24,7 +24,17 @@ describe('Testes da Entidade Pessoa', () => {
       await transaction.rollback();
    });
 
-   it('Should add a name', async () => {
+   it('Should get a person by id', async () => {
+      const pessoa = await servico.Adicionar(mockPessoa, transaction);
+      const id = pessoa[pessoa.dataValues.id]
+      const dataValues = await servico.PegarUm(id, transaction)
+      expect(mockPessoa.nome).toBe(pessoa.dataValues.nome);
+      expect(mockPessoa.email).toBe(pessoa.dataValues.email);
+      expect(mockPessoa.senha).toBe(pessoa.dataValues.senha);
+
+   });
+
+   it('Should add a person', async () => {
       const pessoa = await servico.Adicionar(mockPessoa, transaction);
       console.log(pessoa[pessoa.dataValues.id]) // ou (pessoa.null)
       expect(mockPessoa.nome).toBe(pessoa.dataValues.nome);
@@ -33,7 +43,7 @@ describe('Testes da Entidade Pessoa', () => {
 
    });
 
-   it('Should update a name', async () => {
+   it('Should update a person', async () => {
       const pessoa = await servico.Adicionar(mockPessoa, transaction)
       const id = pessoa.null; // ou pessoa[pessoa.dataValues.id]
       const mockPessoaUpdate = {nome: "User Updated", email: "updated@domain.com", senha: "update#password" };
@@ -46,7 +56,7 @@ describe('Testes da Entidade Pessoa', () => {
       expect(mockPessoaUpdate.senha).toBe(dataValue.dataValues.senha);
    });
 
-   it('Should delete a name', async () => {
+   it('Should delete a person', async () => {
       const pessoa = await servico.Adicionar(mockPessoa, transaction)
       const id = pessoa.null; // ou pessoa[pessoa.dataValues.id]
 
